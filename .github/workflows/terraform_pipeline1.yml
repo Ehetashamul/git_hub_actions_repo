@@ -1,0 +1,43 @@
+name: Terraform Pipeline Practice
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId": "464f189d-b28e-4f77-ae60-922c50bc84e9",
+              "clientSecret": "mCf8Q~xdJ6OzaGabB9f6tlSs3nD8TtmATz4nJdd9",
+              "subscriptionId": "5e0d30bd-3572-4ba7-a892-593061b71738",
+              "tenantId": "2f28d638-b1a5-4814-8476-0d4379015748"
+            }
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.15.8
+
+      - name: Terraform Init
+        run: terraform init
+        
+      - name: Terraform Formating
+        run: terraform fmt
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
