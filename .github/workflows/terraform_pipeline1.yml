@@ -27,17 +27,14 @@ jobs:
         with:
           terraform_version: 1.15.8
 
-      - name: Terraform Init
+      - name: Init
         run: terraform init
         
-      - name: Terraform Formating
-        run: terraform fmt
-
-      - name: Terraform Validate
+      - name: Validate
         run: terraform validate
 
-      - name: Terraform Plan
+      - name: Plan
         run: terraform plan
 
-      - name: Terraform Apply
+      - name: Apply
         run: terraform apply -auto-approve
