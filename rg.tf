@@ -16,3 +16,8 @@ resource "azurerm_resource_group" "rg_prod" {
   location = "Central India"
 }
 
+# Resource Group 4 on self hosted
+resource "azurerm_resource_group" "rg_tpg" {
+  name     = "rg-tpg"
+  location = "Central India"
+}
