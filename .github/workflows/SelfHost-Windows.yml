@@ -1,4 +1,4 @@
-name: Terraform Pipeline Practice
+name: Pipeline Practice Windows
 
 on:
   workflow_dispatch:
