@@ -1,4 +1,4 @@
-name: Pipeline Practice Windows
+name: Terraform Pipeline Practice
 
 on:
   workflow_dispatch:
@@ -8,52 +8,13 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # --------------------------------------------------
-      # 1. Checkout
-      # --------------------------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
       # --------------------------------------------------
-      # 2. Debug runner environment
+      # 1. Azure Login
       # --------------------------------------------------
-      - name: Debug Runner Environment
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "RUNNER INFORMATION"
-          Write-Host "========================================"
-
-          Write-Host "Computer Name:"
-          $env:COMPUTERNAME
-
-          Write-Host "Runner Name:"
-          $env:RUNNER_NAME
-
-          Write-Host "Runner OS:"
-          $env:RUNNER_OS
-
-          Write-Host "Working Directory:"
-          Get-Location
-
-          Write-Host ""
-          Write-Host "========================================"
-          Write-Host "FILES IN WORKING DIRECTORY"
-          Write-Host "========================================"
-
-          Get-ChildItem -Force
-
-          Write-Host ""
-          Write-Host "========================================"
-          Write-Host "TERRAFORM FILES"
-          Write-Host "========================================"
-
-          Get-ChildItem -Recurse -Filter "*.tf" |
-            Select-Object FullName, Length
-
-      # --------------------------------------------------
-      # 3. Azure Login
-      # --------------------------------------------------
+      
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -65,144 +26,36 @@ jobs:
               "tenantId": "2f28d638-b1a5-4814-8476-0d4379015748"
             }
 
-      # --------------------------------------------------
-      # 4. Verify Azure Login
-      # --------------------------------------------------
-      - name: Verify Azure Subscription
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "AZURE ACCOUNT"
-          Write-Host "========================================"
-
-          az account show --query "{Subscription:id, Tenant:tenantId, User:user.name}" -o table
-
-          Write-Host ""
-          Write-Host "========================================"
-          Write-Host "EXISTING RESOURCE GROUPS"
-          Write-Host "========================================"
-
-          az group list --output table
-
-      # --------------------------------------------------
-      # 5. Setup Terraform
-      # --------------------------------------------------
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: 1.15.8
+          terraform_version: 1.14.6
+          terraform_wrapper: false
 
       # --------------------------------------------------
-      # 6. Verify Terraform
+      # 2. Terraform Init
       # --------------------------------------------------
-      - name: Terraform Version
-        shell: powershell
-        run: |
-          terraform version
-          Get-Command terraform
 
-      # --------------------------------------------------
-      # 7. Terraform Init
-      # --------------------------------------------------
       - name: Init
         run: terraform init
-
+        
       # --------------------------------------------------
-      # 8. Terraform Validate
+      # 3. Terraform Validate
       # --------------------------------------------------
+            
       - name: Validate
         run: terraform validate
 
       # --------------------------------------------------
-      # 9. Check Terraform State
+      # 4. Terraform Plan
       # --------------------------------------------------
-      - name: Check Terraform State
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "TERRAFORM STATE"
-          Write-Host "========================================"
 
-          if (Test-Path "terraform.tfstate") {
-              Write-Host "terraform.tfstate FOUND"
-              Get-Item terraform.tfstate
-
-              Write-Host ""
-              Write-Host "Resources in state:"
-              terraform state list
-          }
-          else {
-              Write-Host "No local terraform.tfstate found"
-          }
-
-      # --------------------------------------------------
-      # 10. Terraform Plan
-      # --------------------------------------------------
       - name: Plan
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "TERRAFORM PLAN"
-          Write-Host "========================================"
-
-          terraform plan -out=tfplan -no-color
+        run: terraform plan
 
       # --------------------------------------------------
-      # 11. Display Saved Plan
+      # 5. Terraform Apply
       # --------------------------------------------------
-      - name: Show Plan
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "SAVED TERRAFORM PLAN"
-          Write-Host "========================================"
 
-          terraform show tfplan
-
-      # --------------------------------------------------
-      # 12. Apply EXACTLY the planned changes
-      # --------------------------------------------------
       - name: Apply
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "TERRAFORM APPLY"
-          Write-Host "========================================"
-
-          terraform apply -auto-approve tfplan
-
-      # --------------------------------------------------
-      # 13. Verify Terraform State After Apply
-      # --------------------------------------------------
-      - name: Verify Terraform State
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "STATE AFTER APPLY"
-          Write-Host "========================================"
-
-          terraform state list
-
-      # --------------------------------------------------
-      # 14. Verify Azure Resource Groups
-      # --------------------------------------------------
-      - name: Verify Azure Resource Groups
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "AZURE RESOURCE GROUPS AFTER APPLY"
-          Write-Host "========================================"
-
-          az group list --output table
-
-      # --------------------------------------------------
-      # 15. Verify Terraform Outputs
-      # --------------------------------------------------
-      - name: Terraform Outputs
-        shell: powershell
-        run: |
-          Write-Host "========================================"
-          Write-Host "TERRAFORM OUTPUTS"
-          Write-Host "========================================"
-
-          terraform output
+        run: terraform apply -auto-approve
