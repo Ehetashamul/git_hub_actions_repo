@@ -60,7 +60,7 @@ jobs:
           creds: |
             {
               "clientId": "464f189d-b28e-4f77-ae60-922c50bc84e9",
-              "clientSecret": "mCf8Q~xdJ6OzaGabB9f6tlSs3nD8tme",
+              "clientSecret": "mCf8Q~xdJ6OzaGabB9f6tlSs3nD8TtmATz4nJdd9",
               "subscriptionId": "5e0d30bd-3572-4ba7-a892-593061b71738",
               "tenantId": "2f28d638-b1a5-4814-8476-0d4379015748"
             }
