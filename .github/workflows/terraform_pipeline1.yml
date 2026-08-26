@@ -1,4 +1,4 @@
-name: Terraform Pipeline Practice
+name: Pipeline Practice Git-Runner
 
 on:
   workflow_dispatch:
@@ -11,6 +11,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # --------------------------------------------------
+      # 1. Azure Login
+      # --------------------------------------------------
+      
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -23,18 +27,34 @@ jobs:
             }
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.14.6
+
+      # --------------------------------------------------
+      # 2. Terraform Init
+      # --------------------------------------------------
 
       - name: Init
         run: terraform init
         
+      # --------------------------------------------------
+      # 3. Terraform Validate
+      # --------------------------------------------------
+            
       - name: Validate
         run: terraform validate
 
+      # --------------------------------------------------
+      # 4. Terraform Plan
+      # --------------------------------------------------
+
       - name: Plan
         run: terraform plan
+
+      # --------------------------------------------------
+      # 5. Terraform Apply
+      # --------------------------------------------------
 
       - name: Apply
         run: terraform apply -auto-approve
